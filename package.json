@@ -12,9 +12,11 @@
   "author": "alex-ac2",
   "license": "ISC",
   "dependencies": {
+    "apollo-boost": "^0.4.3",
     "express": "4.17.1",
     "express-graphql": "^0.8.0",
     "graphql": "^14.4.2",
+    "react-apollo": "^2.5.8",
     "uuid": "^3.3.2",
     "ws": "7.0.1"
   }

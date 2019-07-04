@@ -53,10 +53,20 @@ const wss = new SocketServer({ server });
 // the ws parameter in the callback.
 let connectionCount = 0
 
+// Socket methods
+SocketServer.prototype.broadcast = (messageData) => {
+  wss.clients.forEach( (eachClient) => {
+    eachClient.send(JSON.stringify(messageData));
+  });
+};
+
 wss.on('connection', (ws) => {
   console.log('Client connected');
   connectionCount ++;
   console.log('Connection Count: ', connectionCount);
+  console.log('SIZE: ', wss.clients.size);
+
+
 
   ws.on('message', (incomingData) => {
     console.log(incomingData);
@@ -77,9 +87,13 @@ wss.on('connection', (ws) => {
 
     console.log('OUTGOING: ', JSON.stringify(newMessageObject));
     // Broadcast incoming data to all connect clients
-    wss.clients.forEach( (eachClient) => {
-      eachClient.send(JSON.stringify(newMessageObject));
-    });
+    // wss.clients.forEach( (eachClient) => {
+    //   eachClient.send(JSON.stringify(newMessageObject));
+    // });
+
+ 
+    //Send Broadcast
+    wss.broadcast(newMessageObject);
 
 
   });
