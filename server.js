@@ -2,10 +2,12 @@
 const express = require('express');
 const SocketServer = require('ws').Server;
 const uuidv4 = require('uuid/v4');
+const cors = require('cors');
 
 // GraphQL
 const graphqlHTTP = require('express-graphql');
 const { buildSchema } = require('graphql');
+
 
 // Set the port to 3001
 const PORT = 3001;
@@ -18,21 +20,32 @@ const server = express()
 
 const app = express();
 
+// Allow cross-origin requests
+app.use(cors());
+
 // Sample schema
 let schema = buildSchema(`
   type Query {
-    hello: String
+    hello: String,
+    userCount: Int
   }
   type Person {
     name: String!
     age: Int!
+  }
+  type Subscription {
+    onlineCount: Int
   }
   type Mutation {
     createPerson(name: String!, age: Int!): Person!
   }  
 `);
 
-let root = { hello: () => 'Hello world!' };
+let root = { 
+  hello: () => 'Hello world!',
+  userCount: () => 0,
+  onlineCount: () => 1
+};
 
 // GraphQL route
 app.use('/graphql', graphqlHTTP({
