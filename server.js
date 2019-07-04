@@ -19,8 +19,12 @@ const wss = new SocketServer({ server });
 // Set up a callback that will run when a client connects to the server
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
+let connectionCount = 0
+
 wss.on('connection', (ws) => {
   console.log('Client connected');
+  connectionCount ++;
+  console.log('Connection Count: ', connectionCount);
 
   ws.on('message', (incomingData) => {
     console.log(incomingData);
@@ -28,13 +32,14 @@ wss.on('connection', (ws) => {
 
     // Parse incoming data and assign uid
     parsedIncomingData = JSON.parse(incomingData);
-    const {type, content, username} = parsedIncomingData;
+    const {type, content, username, date} = parsedIncomingData;
     const id = uuidv4();
 
     const newMessageObject = {
       type: type,
       content: content,
       username: username,
+      date: date,
       id: id
     }
 
@@ -45,8 +50,12 @@ wss.on('connection', (ws) => {
     });
 
 
-  })
+  });
 
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
-  ws.on('close', () => console.log('Client disconnected'));
+  ws.on('close', () => { 
+    console.log('Client disconnected');
+    connectionCount--;
+  });
+
 });
