@@ -56,7 +56,7 @@ const resolvers = {
         numOfUser: count 
       });
       counter = count;
-      console.log(counter);
+      console.log('updateNum: ', count);
       return count;
     },
     register: (parent, {userInfo: {username} }, { pubsub }) => {

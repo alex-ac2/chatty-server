@@ -3,6 +3,7 @@ const express = require('express');
 const SocketServer = require('ws').Server;
 const uuidv4 = require('uuid/v4');
 const cors = require('cors');
+const axios = require('axios');
 
 // GraphQL Apollo Server
 const graphqlHTTP = require('express-graphql');
@@ -55,16 +56,20 @@ SocketServer.prototype.broadcast = (messageData) => {
   });
 };
 
+SocketServer.prototype.updateUserCount = () => {
+  axios({
+    method: 'post',
+    url: 'http://localhost:5000/graphql',
+    data: {
+      "query": `mutation { updateNum(count: ${wss.clients.size}) }`
+    }
+  });
+}
+
 // Socket on connection
 wss.on('connection', (ws) => {
-  console.log('Client connected');
-  connectionCount ++;
-  console.log('Connection Count: ', connectionCount);
-  console.log('SIZE: ', wss.clients.size);
-  // root.onlineCount2 = wss.clients.size;
-  // root.numOfUser = wss.clients.size;
-
-  //pubsub.publish(USER_COUNT_CHANGED, { numOfUser: 8});
+  const clientSize = wss.clients.size
+  wss.updateUserCount();
 
   ws.on('message', (incomingData) => {
     console.log(incomingData);
@@ -90,8 +95,9 @@ wss.on('connection', (ws) => {
   });
 
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
-  ws.on('close', () => { 
+  ws.on('close', () => {  
     console.log('Client disconnected');
+    wss.updateUserCount();
     connectionCount--;
   });
 
